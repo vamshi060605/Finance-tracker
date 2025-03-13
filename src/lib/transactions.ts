@@ -1,7 +1,7 @@
 import { supabase } from "./supabase";
 
 //getting transactions from the database
-async function getTransactions() {
+export async function getTransactions() {
     const { data, error } = await supabase.from("transactions").select("*");
   
     if (error) {
@@ -13,7 +13,7 @@ async function getTransactions() {
   }
   
   //Adding a transaction to the database
-  async function addTransaction(user_id: string, amount: number, category: string) {
+export async function addTransaction(user_id: string, amount: number, category: string) {
     const { data, error } = await supabase.from("transactions").insert([
       { user_id, amount, category }
     ]);
@@ -27,7 +27,7 @@ async function getTransactions() {
   }
   
   //Updating a transaction in the database
-  async function updateTransaction(id: string, amount: number) {
+export async function updateTransaction(id: string, amount: number) {
     const { data, error } = await supabase
       .from("transactions")
       .update({ amount })
@@ -42,7 +42,7 @@ async function getTransactions() {
   }
   
   //Deleting a transaction from the database
-  async function deleteTransaction(id: string) {
+export async function deleteTransaction(id: string) {
     const { data, error } = await supabase
       .from("transactions")
       .delete()
