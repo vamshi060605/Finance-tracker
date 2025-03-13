@@ -8,7 +8,7 @@ async function getTransactions() {
       console.error("Error fetching transactions:", error.message);
       return [];
     }
-  
+
     return data;
   }
   
