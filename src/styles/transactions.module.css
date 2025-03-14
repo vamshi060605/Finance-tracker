@@ -1,53 +1,31 @@
 .container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
+  @apply max-w-md mx-auto p-5;
 }
 
 h1 {
-  text-align: center;
+  @apply text-center;
 }
 
 .form {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  @apply flex gap-2 mb-5;
 }
 
 .form input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  @apply flex-1 p-2 border border-gray-300 rounded;
 }
 
 .form button {
-  padding: 8px 12px;
-  border: none;
-  background: #0070f3;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
+  @apply p-2 bg-blue-500 text-white cursor-pointer rounded;
 }
 
 .transactionList {
-  list-style: none;
-  padding: 0;
+  @apply list-none p-0;
 }
 
 .transactionList li {
-  display: flex;
-  justify-content: space-between;
-  background: #f4f4f4;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 5px;
+  @apply flex justify-between bg-gray-100 p-2 mb-2 rounded;
 }
 
 .transactionList button {
-  background: red;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
+  @apply bg-red-500 text-white cursor-pointer rounded;
 }
