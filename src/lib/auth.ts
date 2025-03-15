@@ -3,6 +3,9 @@ import { supabase } from "./supabase";
 export async function signInWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`, // Ensure user is redirected correctly
+      }
     });
     if (error) throw new Error(error.message);
 }
