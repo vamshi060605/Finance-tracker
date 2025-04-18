@@ -30,9 +30,4 @@ export async function getCurrentUser() {
     return data.user;
 }
 
-export async function updateProfile(name: string, avatar: string) {
-    // Implement the logic to update the user's profile
-    // This might involve making an API call to update the user data in your backend
-    
-}
 

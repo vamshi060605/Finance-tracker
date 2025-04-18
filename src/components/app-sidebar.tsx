@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { supabase } from "@/lib/supabase"
 
 const data = {
   navMain: [
@@ -21,39 +22,22 @@ const data = {
       title: "Getting Started",
       url: "#",
       items: [
-        {title: "Dashboard ",url: "/dashboard",},
-        {title: "Transactions",url: "/transactions",},
-        {title: "Budget",url: "/budget",},
-        {title: "Savings Goals",url: "/savings-goals",},
-        {title: "Investment Tracking",url: "/investment-tracking",},
-        {title: "Expense Forecasting",url: "/expense-forecasting",},
-        {title: "Settings",url: "/settings",},
-      ],
-    },
-    {
-      title: "Building Your Application",
-      url: "#",
-      items: [
-        {title: "Routing",url: "#",},
-        {title: "Data Fetching",url: "#",isActive: true,}
+        {title: "Dashboard ",url: "/dashboard", isActive: false},
+        {title: "Transactions",url: "/transactions", isActive: false},
+        {title: "Budget",url: "/budget", isActive: false},
+        {title: "Savings Goals",url: "/savings-goals", isActive: false},
+        {title: "Investment Tracking",url: "/investment-tracking", isActive: false},
+        {title: "Expense Forecasting",url: "/expense-forecasting", isActive: false},
+        {title: "Settings",url: "/settings", isActive: false},
       ],
     }
   ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState<{ name: string; avatar_url: string } | null>(null)
-  
-    React.useEffect(() => {
-      async function fetchProfile() {
-        const profile = await getUserProfile() // Fetch user data from Supabase
-        setUser(profile)
-      }
-      fetchProfile()
-    }, [])
+
   return (
     <Sidebar {...props}>
-    
       <SidebarContent>
         {/* We create a SidebarGroup for each parent. */}
         {data.navMain.map((item) => (

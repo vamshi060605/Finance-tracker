@@ -1,7 +1,15 @@
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
+// filepath: d:\1)Studies\vs code\Personal Finance tracking (FSD)\pdf\src\components\ui\avatar.tsx
+import * as React from "react";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import { cn } from "@/lib/utils";
 
-import { cn } from "@/lib/utils"
+// Define avatar options
+export const avatarOptions = [
+  { name: "Avatar 1", url: "/avatars/001.png" },
+  { name: "Avatar 2", url: "/avatars/002.png" },
+  { name: "Avatar 3", url: "/avatars/003.png" },
+  { name: "Avatar 4", url: "/avatars/004.png" }
+];
 
 function Avatar({
   className,
@@ -16,7 +24,7 @@ function Avatar({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarImage({
@@ -29,7 +37,7 @@ function AvatarImage({
       className={cn("aspect-square size-full", className)}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarFallback({
@@ -45,7 +53,7 @@ function AvatarFallback({
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Avatar, AvatarImage, AvatarFallback }
+export { Avatar, AvatarImage, AvatarFallback };

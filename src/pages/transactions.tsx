@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
-
+import '@/styles/globals.css';
 type Transaction = {
   id: string;
   user_id: string;

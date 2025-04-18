@@ -42,8 +42,8 @@ export default function Dashboard() {
 
   if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
 
-  const userAvatar = session?.user?.user_metadata?.avatar_url || "/default-avatar.png"; 
-  const userName = session?.user?.user_metadata?.full_name || "User";
+  const userAvatar = "/avatars/001.png"; // Replace with dynamic value (e.g., from global state or session)
+  const userName = "John Doe"; // Replace with dynamic value
 
   // Sample chart data for Pie Chart (static for now)
   const chartData = [
@@ -74,12 +74,11 @@ export default function Dashboard() {
             <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
           </div>
 
-          <Link href="/profile">
-            <Avatar className="cursor-pointer hover:opacity-80 transition">
-              <AvatarImage src={userAvatar} alt="User Avatar" />
-              <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-            </Avatar>
-          </Link>
+          <Avatar className="cursor-pointer hover:opacity-80 transition">
+            <AvatarImage src={userAvatar} alt="User Avatar" />
+            <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+          </Avatar>
+          
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4">

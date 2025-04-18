@@ -1,30 +1,38 @@
-import { supabase } from "./supabase"
+import { supabase } from "./supabase";
 
-// Fetch the current user’s profile (name & avatar)
-export async function getUserProfile() {
-  const { data: user, error } = await supabase.auth.getUser()
-  if (error || !user?.user) return null
-
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles") // Make sure you have a "profiles" table
-    .select("name, avatar_url")
-    .eq("id", user.user.id)
-    .single()
-
-  if (profileError) return null
-  return profile
-}
-
-// Update user profile (name, avatar)
-export async function updateProfile(name: string, avatar_url: string) {
-  const { data: user, error: userError } = await supabase.auth.getUser()
-  if (userError || !user?.user) throw new Error("User not authenticated.")
+// Get user profile by user ID
+export async function getUserProfile(userId: string) {
+  if (!userId) throw new Error("User ID is required.");
 
   const { data, error } = await supabase
     .from("profiles")
-    .update({ name, avatar_url })
-    .eq("id", user.user.id)
+    .select("full_name, preferred_currency")
+    .eq("id", userId)
+    .single();
 
-  if (error) throw new Error(error.message)
-  return data
+  if (error) throw new Error(error.message);
+
+  return {
+    name: data.full_name,
+    currency: data.preferred_currency
+  };
 }
+
+// Update user profile fields
+export async function updateUserProfile(userId: string, updates: {
+  name?: string;
+  currency?: string;
+}) {
+  if (!userId) throw new Error("User ID is required.");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: updates.name,
+      preferred_currency: updates.currency
+    })
+    .eq("id", userId);
+
+  if (error) throw new Error(error.message);
+}
+
