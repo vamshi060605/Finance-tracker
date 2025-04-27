@@ -1,4 +1,5 @@
 "use client";
+import { ThemeProvider } from "@/components/ui/themes";
 import '@/styles/globals.css';
 import { supabase } from "@/lib/supabase"; // adjust path if needed
 import { useEffect, useState } from "react";
@@ -24,14 +25,15 @@ import { Separator } from "@/components/ui/separator";
 import { avatarOptions } from "@/components/ui/avatar";
 import { getCurrentUser, signOut } from "@/lib/auth";
 import { getUserProfile } from "@/lib/profile";
+import { useTheme } from "next-themes"; // Import useTheme from next-themes
 
 export default function Settings() {
   const [name, setName] = useState("");
   const [currency, setCurrency] = useState("USD");
-  const [theme, setTheme] = useState("light");
   const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0]?.url || "");
   const [avatar, setAvatar] = useState(selectedAvatar);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { theme, setTheme } = useTheme(); // Use theme and setTheme from next-themes
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -72,6 +74,7 @@ export default function Settings() {
   }
 
   return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
@@ -108,7 +111,7 @@ export default function Settings() {
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="theme-toggle">Dark Mode</Label>
+              <Label htmlFor="theme-toggle">Theme</Label>
               <Switch
                 id="theme-toggle"
                 checked={theme === "dark"}
@@ -173,5 +176,6 @@ export default function Settings() {
         </div>
       </SidebarInset>
     </SidebarProvider>
+    </ThemeProvider>
   );
 }

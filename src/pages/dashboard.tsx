@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ThemeProvider } from "next-themes";
 import { useRouter } from "next/router";
 import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
@@ -65,6 +66,7 @@ export default function Dashboard() {
   ];
 
   return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>  
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
@@ -139,5 +141,6 @@ export default function Dashboard() {
         </div>
       </SidebarInset>
     </SidebarProvider>
+   </ThemeProvider>
   );
 }

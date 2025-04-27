@@ -8,7 +8,11 @@ export const avatarOptions = [
   { name: "Avatar 1", url: "/avatars/001.png" },
   { name: "Avatar 2", url: "/avatars/002.png" },
   { name: "Avatar 3", url: "/avatars/003.png" },
-  { name: "Avatar 4", url: "/avatars/004.png" }
+  { name: "Avatar 4", url: "/avatars/004.png" },
+  { name: "Avatar 5", url: "/avatars/005.png" },
+  { name: "Avatar 6", url: "/avatars/006.png" },
+  { name: "Avatar 7", url: "/avatars/007.png" },
+  { name: "Avatar 8", url: "/avatars/008.png" }
 ];
 
 function Avatar({
