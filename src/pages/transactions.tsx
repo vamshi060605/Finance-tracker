@@ -2,46 +2,17 @@
 
 import '@/styles/globals.css';
 import { useEffect, useState } from "react";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetDescription,
-} from "@/components/ui/sheet";
-
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { supabase } from "@/lib/supabase";
+import { ThemeProvider } from "@/components/ui/themes";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from '@/components/app-sidebar';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -51,303 +22,231 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ColumnDef,
-  Row,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
-import { ThemeProvider } from '@/components/ui/themes';
+import { toast } from "sonner";
 
-const userAvatar = "/avatars/001.png";
-const userName = "John Doe";
-
-type Transaction = {
+interface Transaction {
   id: number;
-  name: string;
+  description: string;
   amount: number;
   type: 'income' | 'expense';
+  category: 'needs' | 'wants' | 'savings';
   date: string;
-  description?: string;
-};
+  user_id: string;
+}
 
 export default function TransactionsPage() {
-  const dummyData: Transaction[] = [
-    { id: 1, name: "Groceries", amount: 120, type: "expense", date: "2025-04-22" ,description: "Weekly grocery shopping at local market",},
-    { id: 2, name: "Salary", amount: 5000, type: "income", date: "2025-04-20" ,description: "Salary for the month",},
-  ];
-
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const [viewSheetOpen, setViewSheetOpen] = useState(false);
-  const [editSheetOpen, setEditSheetOpen] = useState(false);
 
   useEffect(() => {
-    setTransactions(dummyData);
+    fetchTransactions();
   }, []);
 
-  const columns: ColumnDef<Transaction>[] = [
-    { accessorKey: 'name', header: 'Name' },
-    { accessorKey: 'amount', header: 'Amount' },
-    { accessorKey: 'type', header: 'Type' },
-    { accessorKey: 'date', header: 'Date' },
-    {
-      id: 'actions',
-      header: '',
-      cell: ({ row }: { row: Row<Transaction> }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem
-              onClick={() => {
-                setSelectedTransaction(row.original);
-                setViewSheetOpen(true);
-              }}
-            >
-              View Transaction
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                setSelectedTransaction(row.original);
-                setEditSheetOpen(true);
-              }}
-            >
-              Modify Transaction
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                console.log("Delete", row.original);
-              }}
-              className="text-red-600 focus:text-red-700"
-            >
-              Delete Transaction
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
-  ];
+  const fetchTransactions = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data, error } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .order('date', { ascending: false });
 
-  const table = useReactTable({
-    data: transactions,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+        if (error) throw error;
+        setTransactions(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddTransaction = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No session');
+
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      
+      const newTransaction = {
+        description: formData.get('description') as string,
+        amount: parseFloat(formData.get('amount') as string),
+        type: formData.get('type') as 'income' | 'expense',
+        category: formData.get('category') as 'needs' | 'wants' | 'savings',
+        date: formData.get('date') as string || new Date().toISOString().split('T')[0],
+        user_id: session.user.id
+      };
+
+      const { error } = await supabase
+        .from('transactions')
+        .insert([newTransaction]);
+
+      if (error) throw error;
+      
+      await fetchTransactions();
+      form.reset();
+
+      const dialogClose = document.querySelector('[data-state="open"]') as HTMLButtonElement;
+      if (dialogClose) dialogClose.click();
+
+      toast.success('Transaction added successfully');
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+      toast.error('Failed to add transaction');
+    }
+  };
+
+  const handleDeleteTransaction = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchTransactions();
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 items-center justify-between border-b px-4">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
-          </div>
-          <Avatar className="cursor-pointer hover:opacity-80 transition">
-            <AvatarImage src={userAvatar} alt="User Avatar" />
-            <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-          </Avatar>
-        </header>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Transactions</CardTitle>
-            <CardDescription>Last 20 transactions</CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map(headerGroup => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-
-                <TableBody>
-                  {table.getRowModel().rows.length ? (
-                    table.getRowModel().rows.map(row => (
-                      <TableRow key={row.id}>
-                        {row.getVisibleCells().map(cell => (
-                          <TableCell key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} className="h-24 text-center">No results.</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-16 items-center justify-between border-b px-4">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
             </div>
-          </CardContent>
+            <Avatar className="cursor-pointer hover:opacity-80 transition">
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          </header>
 
-          <CardFooter className="flex justify-end">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>Add Transaction</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Add New Transaction</DialogTitle>
-                  <DialogDescription>Fill in the details to log a new transaction.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">Name</Label>
-                    <input  placeholder="Groceries,Salary,Shopping" id="name" type="text" className="col-span-3 border rounded px-3 py-2 w-full" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="amount" className="text-right">Amount</Label>
-                    <input placeholder="Amount"id="amount" type="number" className="col-span-3 border rounded px-3 py-2 w-full" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="category" className="text-right">Category</Label>
-                    <select id="category" className="col-span-3 border rounded px-3 py-2 w-full">
-                      <option value="">Select</option>
-                      <option value="food">Food</option>
-                      <option value="transport">Transport</option>
-                      <option value="salary">Salary</option>
-                      <option value="entertainment">Entertainment</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label className="text-right">Type</Label>
-                    <div className="col-span-3 flex items-center gap-4">
-                      <label className="flex items-center gap-2">
-                        <input type="radio" name="type" value="income" defaultChecked />
-                        <span>Income</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input type="radio" name="type" value="expense" />
-                        <span>Expense</span>
-                      </label>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="date" className="text-right">Date</Label>
-                    <input id="date" type="date" className="col-span-3 border rounded px-3 py-2 w-full"
-                      defaultValue={new Date().toISOString().split("T")[0]} />
-                  </div>
-                </div>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="notes" className="text-right">Description</Label>
-                    <textarea id="notes" rows={3} className="col-span-3 border rounded px-3 py-2 w-full" placeholder="Add any notes here..."></textarea>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button onClick={() => console.log("Save clicked")}>Save</Button>
-                  <Button variant="ghost">Cancel</Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardFooter>
-        </Card>
-
-        {/* View Transaction Sheet */}
-        <Sheet open={viewSheetOpen} onOpenChange={setViewSheetOpen}>
-          <SheetContent className="p-4">
-            <SheetHeader>
-              <SheetTitle>Transaction Details</SheetTitle>
-              <SheetDescription>View details of the transaction.</SheetDescription>
-            </SheetHeader>
-            <SheetDescription>
-            {selectedTransaction && (
-              <div className="space-y-2 mt-4">
-                <p><strong>Name:</strong> {selectedTransaction.name}</p>
-                <p><strong>Amount:</strong> ${selectedTransaction.amount}</p>
-                <p><strong>Type:</strong> {selectedTransaction.type}</p>
-                <p><strong>Date:</strong> {selectedTransaction.date}</p>
-                <p><strong>Description:</strong> {selectedTransaction.description || "No description provided."}</p>
-              </div>
-            )}
-            </SheetDescription>
-          </SheetContent>
-        </Sheet>
-
-        {/* Modify Transaction Sheet */}
-        <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
-          <SheetContent className="p-4">
-            <SheetHeader>
-              <SheetTitle>Edit Transaction</SheetTitle>
-              <SheetDescription>Make changes to the transaction.</SheetDescription>
-            </SheetHeader>
-            {selectedTransaction && (
-              <div className="space-y-4 mt-4">
+          <div className="p-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <Label>Name</Label>
-                  <input
-                    type="text"
-                    defaultValue={selectedTransaction.name}
-                    className="w-full border rounded px-3 py-2"
-                  />
+                  <CardTitle>Transactions</CardTitle>
+                  <CardDescription>Manage your transactions</CardDescription>
                 </div>
-                <div>
-                  <Label>Amount</Label>
-                  <input
-                    type="number"
-                    defaultValue={selectedTransaction.amount}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <Label>Date</Label>
-                  <input
-                    type="date"
-                    defaultValue={selectedTransaction.date}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-
-                <div>
-                  <Label>Description</Label>
-                  <textarea
-                    defaultValue={selectedTransaction.description}
-                    rows={3}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <Button
-                    onClick={() => {
-                      // TODO: update transaction logic
-                      console.log("Save updated transaction");
-                    }}
-                  >
-                    Save
-                  </Button>
-                  <Button variant="ghost" onClick={() => setEditSheetOpen(false)}>Cancel</Button>
-                </div>
-              </div>
-            )}
-          </SheetContent>
-        </Sheet>
-      </SidebarInset>
-    </SidebarProvider>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>Add Transaction</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Transaction</DialogTitle>
+                      <DialogDescription>Add a new transaction to your account.</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleAddTransaction} className="space-y-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="description" className="text-right">Name</Label>
+                        <Input id="description" name="description" className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="amount" className="text-right">Amount</Label>
+                        <Input id="amount" name="amount" type="number" step="0.01" className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="type" className="text-right">Type</Label>
+                        <select id="type" name="type" className="col-span-3 p-2 border rounded" required>
+                          <option value="expense">Expense</option>
+                          <option value="income">Income</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="category" className="text-right">Category</Label>
+                        <select id="category" name="category" className="col-span-3 p-2 border rounded" required>
+                          <option value="needs">Needs</option>
+                          <option value="wants">Wants</option>
+                          <option value="savings">Savings</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="date" className="text-right">Date</Label>
+                        <Input 
+                          id="date" 
+                          name="date" 
+                          type="date" 
+                          className="col-span-3" 
+                          required
+                          defaultValue={new Date().toISOString().split('T')[0]} 
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="description" className="text-right">Description</Label>
+                        <Input id="description" name="description" className="col-span-3" />
+                      </div>
+                      <DialogFooter>
+                        <Button type="submit">Add Transaction</Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell>{transaction.description}</TableCell>
+                        <TableCell>₹{transaction.amount.toFixed(2)}</TableCell>
+                        <TableCell className="capitalize">{transaction.type}</TableCell>
+                        <TableCell className="capitalize">{transaction.category}</TableCell>
+                        <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => setSelectedTransaction(transaction)}>
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDeleteTransaction(transaction.id)}>
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     </ThemeProvider>
   );
 }

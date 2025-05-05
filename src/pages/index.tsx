@@ -1,14 +1,20 @@
-import * as React from "react";
-import { LoginForm } from "@/components/ui/login-form";
-import "@/styles/tailwind.css"; // Tailwind utilities
-import "@/styles/globals.css";   // Your global styles
-import { ThemeProvider } from "next-themes"; // Theme provider for dark mode support
-export default function Home() {
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { LoginForm } from "@/components/ui/login-form"
+import "@/styles/globals.css"
+import "@/styles/tailwind.css"
+import { checkAuthAndRedirect } from "@/lib/auth";
+
+export default function Login() {
+  const router = useRouter();
+
+  useEffect(() => {
+    checkAuthAndRedirect(router, false);
+  }, [router]);
+
   return (
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>  
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex min-h-screen items-center justify-center bg-background">
       <LoginForm />
     </div>
-  </ThemeProvider>  
-  );
+  )
 }

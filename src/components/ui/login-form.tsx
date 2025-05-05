@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
 import { signInWithGoogle, signInWithEmail, signUpWithEmail } from "@/lib/auth"; // Add signup logic
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link"; // Use Link for Next.js routing
+import { supabase } from "@/lib/supabase";
 
 export function LoginForm({ className = "" }) {
   const [isSignup, setIsSignup] = useState(false); // Toggle between login and signup
@@ -17,14 +18,27 @@ export function LoginForm({ className = "" }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    // Single source of auth state
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        // Wait for session to be fully established
+        await supabase.auth.getSession();
+        router.push('/dashboard');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
+      setError(null);
       await signInWithGoogle();
-      router.push("/dashboard"); // Redirect after login
+      // Remove router.push - handled by callback
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -42,12 +56,12 @@ export function LoginForm({ className = "" }) {
           throw new Error("Passwords do not match");
         }
         await signUpWithEmail(email, password);
+        // Don't redirect here, let auth state change handle it
       } else {
         // Login flow
         await signInWithEmail(email, password);
+        // Don't redirect here, let auth state change handle it
       }
-
-      router.push("/dashboard"); // Redirect to dashboard after success
     } catch (err: any) {
       setError(err.message);
     } finally {
