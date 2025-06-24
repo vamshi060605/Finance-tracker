@@ -1,4 +1,7 @@
+// Shared TypeScript interfaces for user, transaction, budget, and related entities
+
 export interface User {
+  // User profile information
   id: string;
   email: string;
   full_name?: string;
@@ -8,6 +11,7 @@ export interface User {
 }
 
 export interface Transaction {
+  // Transaction record
   id: string;
   user_id: string;
   amount: number;
@@ -19,6 +23,7 @@ export interface Transaction {
 }
 
 export interface Budget {
+  // Budget record for a category and period
   id: string;
   user_id: string;
   category: string;
@@ -29,6 +34,7 @@ export interface Budget {
 }
 
 export interface SavingsGoal {
+  // Savings goal definition
   id: string;
   user_id: string;
   name: string;
@@ -39,6 +45,7 @@ export interface SavingsGoal {
 }
 
 export interface MonthlyAllocation {
+  // Monthly allocation for needs, wants, and savings
   id: string;
   user_id: string;
   month: string;

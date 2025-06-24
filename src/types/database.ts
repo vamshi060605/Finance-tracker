@@ -1,4 +1,7 @@
+// Database table interfaces for monthly snapshots, profiles, transactions, and allocations
+
 export interface MonthlySnapshot {
+  // Snapshot of balances and totals for a month
   id: string
   user_id: string
   month: number
@@ -12,6 +15,7 @@ export interface MonthlySnapshot {
 }
 
 export interface Profile {
+  // User profile table structure
   id: string
   user_id: string
   full_name: string | null
@@ -22,6 +26,7 @@ export interface Profile {
 }
 
 export interface Transaction {
+  // Transaction table structure
   id: string;
   user_id: string;
   amount: number;
@@ -32,6 +37,7 @@ export interface Transaction {
 }
 
 export interface MonthlyAllocation {
+  // Monthly allocation table structure
   id: string;
   user_id: string;
   month: string;

@@ -1,5 +1,8 @@
+// Aggregates dashboard data for the current user
+
 import { supabase } from "./supabase";
 
+// Fetches transactions, allocation, and profile for dashboard display
 export async function getDashboardData(userId: string) {
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -27,6 +30,7 @@ export async function getDashboardData(userId: string) {
       .single()
   ]);
 
+  // Calculate monthly income and expenses
   const monthlyIncome = transactions.data
     ?.filter(t => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0) || 0;

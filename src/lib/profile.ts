@@ -1,6 +1,9 @@
+// Functions for handling user profile CRUD and updates
+
 import { supabase } from "./supabase";
 import { Profile as DatabaseProfile } from '@/types/database';
 
+// Response type for profile fetch
 export interface ProfileResponse {
   data: {
     name: string;
@@ -10,6 +13,7 @@ export interface ProfileResponse {
   error: any | null;
 }
 
+// Profile interface representing a row in the profiles table
 export interface Profile {
   id: string;
   user_id: string;
@@ -42,6 +46,7 @@ export async function getUserProfile(userId: string): Promise<Profile | null> {
   }
 }
 
+// Update user profile fields (name, avatar, currency)
 export async function updateUserProfile(userId: string, updates: {
   full_name?: string;
   preferred_currency?: string;
@@ -75,6 +80,7 @@ export async function updateUserProfile(userId: string, updates: {
   }
 }
 
+// Update profile with additional fields (monthly_income, budget_alerts)
 export async function updateProfile(userId: string, updates: {
   full_name?: string;
   preferred_currency?: string;
@@ -90,6 +96,7 @@ export async function updateProfile(userId: string, updates: {
   if (error) throw error;
 }
 
+// Get profile and related monthly allocations for a user
 export async function getProfile(userId: string) {
   const { data, error } = await supabase
     .from('profiles')

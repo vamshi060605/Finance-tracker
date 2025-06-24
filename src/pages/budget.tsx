@@ -1,3 +1,5 @@
+// Budget page: shows budget overview for needs, wants, and savings categories
+
 "use client";
 import { ThemeProvider } from "@/components/ui/themes"
 import '@/styles/globals.css';
@@ -18,6 +20,7 @@ import {
 } from "@/components/ui/breadcrumb";
 
 interface Transaction {
+  // Transaction type for budget calculations
   id: number;
   description: string;
   amount: number;
@@ -30,6 +33,7 @@ const userAvatar = "/avatars/001.png";
 const userName = "John Doe";
 
 export default function Budget() {
+  // State for session, loading, budgets, spent, and transactions
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -47,6 +51,7 @@ export default function Budget() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
+    // Fetch budget data and transactions for the current month
     const fetchBudgetData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
@@ -101,6 +106,7 @@ export default function Budget() {
   }
 
   return (
+    // Main UI: header and budget overview cards for each category
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>  
         <SidebarProvider>
           <AppSidebar />

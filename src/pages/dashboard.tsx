@@ -1,3 +1,5 @@
+// Dashboard page: shows user summary, charts, and recent transactions
+
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { ThemeProvider } from "next-themes";
@@ -47,6 +49,7 @@ interface Profile {
 }
 
 export default function Dashboard() {
+  // State and data fetching logic
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<{
@@ -60,6 +63,7 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
+    // Fetch dashboard data on mount
     const fetchDashboardData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -120,6 +124,7 @@ export default function Dashboard() {
     .reduce((sum, t) => sum + t.amount, 0);
 
   return (
+    // Main dashboard UI: header, summary cards, charts, and recent transactions
     <AuthGuard>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>  
         <SidebarProvider>

@@ -1,6 +1,9 @@
+// API utility functions for fetching allocations and transactions
+
 import { supabase } from "./supabase";
 import type { Transaction, MonthlyAllocation } from "@/types";
 
+// Get current month's allocation for a user
 export async function getCurrentMonthAllocation(userId: string): Promise<MonthlyAllocation | null> {
   const firstDayOfMonth = new Date();
   firstDayOfMonth.setDate(1);
@@ -16,6 +19,7 @@ export async function getCurrentMonthAllocation(userId: string): Promise<Monthly
   return data;
 }
 
+// Get all transactions for the current month for a user
 export async function getCurrentMonthTransactions(userId: string): Promise<Transaction[]> {
   const firstDayOfMonth = new Date();
   firstDayOfMonth.setDate(1);

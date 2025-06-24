@@ -1,3 +1,5 @@
+// Needs page: displays needs transactions, total spent, and allows adding new expenses
+
 "use client";
 
 import '@/styles/globals.css';
@@ -16,6 +18,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getUserProfile } from "@/lib/profile";
 
 interface NeedsTransaction {
+  // Transaction type for needs category
   id: number;
   description: string;
   amount: number;
@@ -25,6 +28,7 @@ interface NeedsTransaction {
 }
 
 export default function Needs() {
+  // State for transactions, totals, loading, and user info
   const [transactions, setTransactions] = useState<NeedsTransaction[]>([]);
   const [totalSpent, setTotalSpent] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -32,6 +36,7 @@ export default function Needs() {
   const [avatar, setAvatar] = useState("/avatars/001.png");
   const [userName, setUserName] = useState("User");
 
+  // Fetch needs transactions and calculate totals
   const fetchNeedsTransactions = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     
@@ -66,6 +71,7 @@ export default function Needs() {
     fetchNeedsTransactions();
   }, []);
 
+  // Refresh data after adding a new expense
   const refreshData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -87,6 +93,7 @@ export default function Needs() {
     }
   };
 
+  // Load user avatar and name for header
   useEffect(() => {
     const loadUserData = async () => {
       try {

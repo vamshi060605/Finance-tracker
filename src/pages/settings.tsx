@@ -1,3 +1,5 @@
+// Settings page: edit user profile, theme, avatar, and logout
+
 "use client";
 import '@/styles/globals.css';
 import { supabase } from "@/lib/supabase"; // adjust path if needed
@@ -45,6 +47,7 @@ import { AuthGuard } from '@/components/auth-guard';
 import { toast } from "sonner";
 
 export default function SettingsPage() {
+  // AuthGuard wrapper for settings
   return (
     <AuthGuard>
       <Settings />
@@ -53,6 +56,7 @@ export default function SettingsPage() {
 }
 
 function Settings() {
+  // State for loading, error, profile, name, currency, avatar, dialog, and theme
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +69,7 @@ function Settings() {
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
+    // Fetch user and profile data on mount
     const fetchUser = async () => {
       try {
         setLoading(true);
@@ -88,10 +93,12 @@ function Settings() {
     fetchUser();
   }, []);
 
+  // Handle avatar selection
   const handleAvatarSelect = (avatarUrl: string) => {
     setSelectedAvatar(avatarUrl);
   };
 
+  // Handle saving profile changes
   const handleSave = async () => {
     try {
       const user = await getCurrentUser();
@@ -120,6 +127,7 @@ function Settings() {
     }
   };
 
+  // Handle logout
   const handleLogout = async () => {
     await signOut();
     window.location.href = "/";
@@ -129,6 +137,7 @@ function Settings() {
   if (error) return <div>Error: {error}</div>;
 
   return (
+    // Main UI: header, profile card, theme switch, edit dialog, and logout
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>  
         <SidebarProvider>
           <AppSidebar />

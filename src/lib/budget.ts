@@ -1,7 +1,10 @@
+// Functions for managing budgets and monthly allocations
+
 import { supabase } from './supabase';
 import { SPENDING_RULES } from "@/config/constants";
 import type { MonthlyAllocation } from "@/types/database";
 
+// Budget type for budget records
 export type Budget = {
   id: number;
   user_id: string;
@@ -12,6 +15,7 @@ export type Budget = {
   created_at?: string;
 }
 
+// Fetch all budgets for a user
 export async function getBudgets(userId: string): Promise<{ data: Budget[] | null; error: any }> {
   try {
     const { data, error } = await supabase
@@ -27,6 +31,7 @@ export async function getBudgets(userId: string): Promise<{ data: Budget[] | nul
   }
 }
 
+// Add a new budget
 export async function addBudget(budget: Omit<Budget, 'id'>): Promise<{ data: Budget | null; error: any }> {
   try {
     const { data, error } = await supabase
@@ -42,6 +47,7 @@ export async function addBudget(budget: Omit<Budget, 'id'>): Promise<{ data: Bud
   }
 }
 
+// Update an existing budget by id
 export async function updateBudget(id: number, updates: Partial<Budget>): Promise<{ data: Budget | null; error: any }> {
   try {
     const { data, error } = await supabase
@@ -58,6 +64,7 @@ export async function updateBudget(id: number, updates: Partial<Budget>): Promis
   }
 }
 
+// Initialize monthly budget allocation for a user
 export async function initializeMonthlyBudget(userId: string, income: number) {
   const now = new Date();
   const month = now.toISOString().split('T')[0];
@@ -81,6 +88,7 @@ export async function initializeMonthlyBudget(userId: string, income: number) {
   return allocation;
 }
 
+// Update spending for a category in the current month
 export async function updateSpending(
   userId: string,
   category: 'needs' | 'wants' | 'savings',

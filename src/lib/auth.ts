@@ -1,6 +1,9 @@
+// Authentication and session management functions
+
 import { supabase } from "./supabase";
 import { handleMonthlyReset } from "./monthlyReset";
 
+// Sign in using Google OAuth
 export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
@@ -11,21 +14,25 @@ export async function signInWithGoogle() {
   if (error) throw error;
 }
   
+// Sign in using email and password
 export async function signInWithEmail(email: string, password: string) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw new Error(error.message);
 }
 
+// Sign up using email and password
 export async function signUpWithEmail(email: string, password: string) {
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) throw new Error(error.message);
 }
   
+// Sign out the current user
 export async function signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw new Error(error.message);
 }
 
+// Get the currently authenticated user and initialize profile if needed
 export async function getCurrentUser() {
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error) throw error;
@@ -53,6 +60,7 @@ export async function getCurrentUser() {
   return user;
 }
 
+// Check authentication and redirect based on session state
 export async function checkAuthAndRedirect(router: any, requireAuth = true) {
     try {
         const { data: { session }, error } = await supabase.auth.getSession();

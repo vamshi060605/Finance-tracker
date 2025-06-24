@@ -1,3 +1,5 @@
+// Wants page: displays wants transactions, total spent, and allows adding new expenses
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -15,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ExpenseForm } from "@/components/expense-form";
 
 interface WantsTransaction {
+  // Transaction type for wants category
   id: number;
   description: string;
   amount: number;
@@ -24,11 +27,13 @@ interface WantsTransaction {
 }
 
 export default function Wants() {
+  // State for transactions, totals, loading, and add expense dialog
   const [transactions, setTransactions] = useState<WantsTransaction[]>([]);
   const [totalSpent, setTotalSpent] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
 
+  // Refresh data after adding a new expense
   const refreshData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -58,6 +63,7 @@ export default function Wants() {
   };
 
   useEffect(() => {
+    // Fetch wants transactions and calculate totals
     const fetchWantsTransactions = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -85,6 +91,7 @@ export default function Wants() {
   }
 
   return (
+    // Main UI: header, summary card, transactions table, and add expense form
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <SidebarProvider>
         <AppSidebar />

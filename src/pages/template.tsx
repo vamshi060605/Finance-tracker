@@ -1,3 +1,5 @@
+// Template page: use as a starting point for new pages
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { ThemeProvider } from "next-themes";
@@ -12,11 +14,13 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function TemplatePage() {
+  // State for session and loading
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
+    // Check session and redirect if not authenticated
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
@@ -36,6 +40,7 @@ export default function TemplatePage() {
   const userName = "John Doe";
 
   return (
+    // Main UI: header and placeholder content
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <SidebarProvider>
         <AppSidebar />

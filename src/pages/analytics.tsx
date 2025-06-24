@@ -1,3 +1,5 @@
+// Analytics page: shows monthly snapshots, charts, and budget distribution
+
 // This project uses Next.js Pages Router (not App Router)
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
@@ -15,11 +17,13 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { getCurrentUser } from "@/lib/auth"
 
 interface ChartData {
+  // Data type for chart visualizations
   name: string
   value: number
 }
 
 interface MonthlySnapshotsTable {
+  // Type for monthly snapshot records
   id: string
   user_id: string
   month: number
@@ -32,6 +36,7 @@ interface MonthlySnapshotsTable {
 }
 
 export default function AnalyticsPage() {
+  // State for monthly data, distribution, current snapshot, loading, and error
   const [monthlyData, setMonthlyData] = useState<MonthlySnapshotsTable[]>([])
   const [distribution, setDistribution] = useState<ChartData[]>([])
   const [currentSnapshot, setCurrentSnapshot] = useState<MonthlySnapshotsTable | null>(null)
@@ -41,6 +46,7 @@ export default function AnalyticsPage() {
   const userName = "User" // Replace with dynamic username from auth/profile
 
   useEffect(() => {
+    // Initialize analytics data on mount
     const initialize = async () => {
       try {
         const user = await getCurrentUser()
@@ -71,6 +77,7 @@ export default function AnalyticsPage() {
     }
   }, [currentSnapshot])
 
+  // Fetch and update current month snapshot
   async function fetchCurrentMonthSnapshot(userId: string) {
     const now = new Date()
     const currentMonth = now.getMonth() + 1
@@ -153,6 +160,7 @@ export default function AnalyticsPage() {
     }
   }
 
+  // Fetch all monthly snapshot data
   async function fetchMonthlyData(userId: string) {
     try {
       const { data: monthlySnapshots, error } = await supabase
@@ -179,6 +187,7 @@ export default function AnalyticsPage() {
     }
   }
 
+  // Calculate distribution for pie chart
   function calculateDistribution() {
     if (!currentSnapshot) return
 
@@ -194,6 +203,7 @@ export default function AnalyticsPage() {
   if (error) return <div className="p-4 text-red-500">{error}</div>
 
   return (
+    // Main UI: header, summary cards, bar chart, pie chart, and monthly summary
     <AuthGuard>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>  
         <SidebarProvider>

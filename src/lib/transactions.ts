@@ -1,7 +1,10 @@
+// Functions for handling CRUD operations on transactions
+
 import { supabase } from "./supabase";
 import { updateSpending } from "./budget";
 import type { TransactionInput } from "./validations/transaction";
 
+// Transaction interface representing a row in the transactions table
 export interface Transaction {
   id: string;
   amount: number;
@@ -12,6 +15,7 @@ export interface Transaction {
   userId: string;
 }
 
+// Fetch all transactions for a user, ordered by date descending
 export async function getTransactions(userId: string): Promise<{ data: Transaction[] | null; error: any }> {
   try {
     const { data, error } = await supabase
@@ -28,6 +32,7 @@ export async function getTransactions(userId: string): Promise<{ data: Transacti
   }
 }
 
+// Add a new transaction for a user
 export async function addTransaction(transaction: Omit<Transaction, 'id'>): Promise<{ data: Transaction | null; error: any }> {
   try {
     const { data, error } = await supabase
@@ -44,6 +49,7 @@ export async function addTransaction(transaction: Omit<Transaction, 'id'>): Prom
   }
 }
 
+// Update an existing transaction by id
 export async function updateTransaction(id: number, updates: Partial<Transaction>): Promise<{ data: Transaction | null; error: any }> {
   try {
     const { data, error } = await supabase
@@ -61,6 +67,7 @@ export async function updateTransaction(id: number, updates: Partial<Transaction
   }
 }
 
+// Delete a transaction by id
 export async function deleteTransaction(id: number): Promise<{ error: any }> {
   try {
     const { error } = await supabase
@@ -76,6 +83,7 @@ export async function deleteTransaction(id: number): Promise<{ error: any }> {
   }
 }
 
+// Create a transaction and update monthly allocation if needed
 export async function createTransaction(
   userId: string,
   transaction: TransactionInput
@@ -104,6 +112,7 @@ export async function createTransaction(
   }
 }
 
+// Get transactions for a user within a specific date range
 export async function getTransactionsByPeriod(
   userId: string,
   startDate: string,

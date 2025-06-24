@@ -1,3 +1,5 @@
+// Help page: displays FAQs and support information
+
 "use client";
 
 import '@/styles/globals.css';

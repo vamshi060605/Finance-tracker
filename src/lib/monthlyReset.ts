@@ -1,6 +1,9 @@
+// Handles monthly reset of allocations and creation of monthly snapshots
+
 import { supabase } from "./supabase";
 import type { MonthlyAllocation } from "@/types";
 
+// Resets monthly allocations and creates a snapshot for the previous month
 export async function handleMonthlyReset(userId: string) {
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -15,7 +18,7 @@ export async function handleMonthlyReset(userId: string) {
       .eq('month', prevMonth.toISOString().split('T')[0])
       .single();
 
-    // Calculate total income and expenses
+    // Calculate total income and expenses for previous month
     const { data: monthData } = await supabase
       .from('transactions')
       .select('*')
@@ -33,7 +36,7 @@ export async function handleMonthlyReset(userId: string) {
       savings: monthData?.filter(t => t.category === 'savings').reduce((sum, t) => sum + t.amount, 0) || 0
     };
 
-    // Create snapshot
+    // Create snapshot for previous month
     await supabase.from('monthly_snapshots').insert({
       user_id: userId,
       month: prevMonth.getMonth() + 1,
@@ -45,7 +48,7 @@ export async function handleMonthlyReset(userId: string) {
       savings_balance: expenses.savings
     });
 
-    // Create new allocation
+    // Create new allocation for current month
     await supabase.from('monthly_allocations').insert({
       user_id: userId,
       month: firstDayOfMonth.toISOString().split('T')[0],

@@ -1,3 +1,5 @@
+// Custom error class and error handling utilities
+
 export class AppError extends Error {
   constructor(
     message: string,
@@ -9,6 +11,7 @@ export class AppError extends Error {
   }
 }
 
+// Error code constants for different error types
 export const ErrorCodes = {
   UNAUTHORIZED: 'AUTH_ERROR',
   INVALID_INPUT: 'VALIDATION_ERROR',
@@ -16,6 +19,7 @@ export const ErrorCodes = {
   NOT_FOUND: 'NOT_FOUND',
 } as const;
 
+// Generic error handler for returning error messages and codes
 export function handleError(error: unknown) {
   if (error instanceof Error) {
     return {

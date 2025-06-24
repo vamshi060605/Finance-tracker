@@ -1,3 +1,5 @@
+// Supported currencies and currency formatting utility
+
 export const SUPPORTED_CURRENCIES = {
   INR: {
     symbol: "₹",
@@ -18,6 +20,7 @@ export const SUPPORTED_CURRENCIES = {
 
 export type CurrencyCode = keyof typeof SUPPORTED_CURRENCIES;
 
+// Formats a number as a currency string based on currency code
 export function formatCurrency(amount: number, currency: CurrencyCode = "INR") {
   const { locale, symbol } = SUPPORTED_CURRENCIES[currency];
   return new Intl.NumberFormat(locale, {

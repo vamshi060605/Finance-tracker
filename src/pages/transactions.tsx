@@ -1,3 +1,5 @@
+// Transactions page: manage, add, and delete all user transactions
+
 "use client";
 
 import '@/styles/globals.css';
@@ -31,6 +33,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { toast } from "sonner";
 
 interface Transaction {
+  // Transaction type for the transactions table
   id: number;
   description: string;
   amount: number;
@@ -41,6 +44,7 @@ interface Transaction {
 }
 
 export default function TransactionsPage() {
+  // State for transactions, loading, and selected transaction
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -49,6 +53,7 @@ export default function TransactionsPage() {
     fetchTransactions();
   }, []);
 
+  // Fetch all transactions for the user
   const fetchTransactions = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -69,6 +74,7 @@ export default function TransactionsPage() {
     }
   };
 
+  // Handle adding a new transaction
   const handleAddTransaction = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -106,6 +112,7 @@ export default function TransactionsPage() {
     }
   };
 
+  // Handle deleting a transaction
   const handleDeleteTransaction = async (id: number) => {
     try {
       const { error } = await supabase
@@ -125,6 +132,7 @@ export default function TransactionsPage() {
   }
 
   return (
+    // Main UI: header, add transaction dialog, and transactions table
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <SidebarProvider>
         <AppSidebar />

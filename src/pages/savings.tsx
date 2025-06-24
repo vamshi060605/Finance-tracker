@@ -1,3 +1,5 @@
+// Savings page: displays savings transactions, total spent, and allows adding new expenses
+
 "use client";
 
 import '@/styles/globals.css';
@@ -14,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { ExpenseForm } from "@/components/expense-form";
 
 interface NeedsTransaction {
+  // Transaction type for savings category
   id: number;
   description: string;
   amount: number;
@@ -23,11 +26,13 @@ interface NeedsTransaction {
 }
 
 export default function Savings() {
+  // State for transactions, totals, loading, and add expense dialog
   const [transactions, setTransactions] = useState<NeedsTransaction[]>([]);
   const [totalSpent, setTotalSpent] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
 
+  // Refresh data after adding a new expense
   const refreshData = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -57,6 +62,7 @@ export default function Savings() {
   };
 
   useEffect(() => {
+    // Fetch savings transactions and calculate totals
     const fetchNeedsTransactions = async () => {
       await refreshData();
       setLoading(false);
@@ -70,6 +76,7 @@ export default function Savings() {
   }
 
   return (
+    // Main UI: header, summary card, transactions table, and add expense form
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <SidebarProvider>
         <AppSidebar />

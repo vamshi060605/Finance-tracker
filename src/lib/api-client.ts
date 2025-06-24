@@ -1,6 +1,9 @@
+// API client class for interacting with Supabase tables
+
 import { supabase } from './supabase';
 import type { User, Transaction, Budget, SavingsGoal } from '@/types';
 
+// Custom error class for API errors
 class APIError extends Error {
   constructor(
     public statusCode: number,
@@ -12,7 +15,9 @@ class APIError extends Error {
   }
 }
 
+// APIClient provides methods for user, transaction, and budget operations
 export class APIClient {
+  // Fetch a user profile by userId
   async getUser(userId: string): Promise<User> {
     const { data, error } = await supabase
       .from('profiles')
@@ -24,6 +29,7 @@ export class APIClient {
     return data;
   }
 
+  // Update a user profile
   async updateUser(userId: string, updates: Partial<User>): Promise<User> {
     const { data, error } = await supabase
       .from('profiles')
@@ -35,6 +41,7 @@ export class APIClient {
     return data;
   }
 
+  // Fetch all transactions for a user
   async getTransactions(userId: string): Promise<Transaction[]> {
     const { data, error } = await supabase
       .from('transactions')
@@ -46,6 +53,7 @@ export class APIClient {
     return data;
   }
 
+  // Create a new transaction
   async createTransaction(transaction: Omit<Transaction, 'id'>): Promise<Transaction> {
     const { data, error } = await supabase
       .from('transactions')
@@ -60,4 +68,5 @@ export class APIClient {
   // Add more methods as needed
 }
 
+// Export a singleton API client instance
 export const api = new APIClient();

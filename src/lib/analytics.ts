@@ -1,6 +1,9 @@
+// Analytics utilities for monthly snapshots
+
 import { MonthlySnapshot } from '@/types/database'
 import { supabase } from './supabase'
 
+// Initialize a monthly snapshot for a user if not present
 export async function initializeMonthlySnapshot(userId: string): Promise<MonthlySnapshot> {
   const now = new Date()
   const month = now.getMonth() + 1
